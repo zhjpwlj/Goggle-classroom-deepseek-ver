@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body { font-family: 'Product Sans', Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 24px; font-weight: bold; color: #4285F4; }
+    .post { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+    .post-actions { margin-top: 10px; }
+    button { background-color: #4285F4; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #3367D6; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">Goggle Classroom</div>
+    <div id="user-info"></div>
+  </div>
+  
+  <div id="login-section">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+  </div>
+  
+  <div id="classroom-section" style="display:none;">
+    <h2>Your Classes</h2>
+    <div id="classes-list"></div>
+    
+    <h2>Class Feed</h2>
+    <div id="posts-container"></div>
+    
+    <div id="new-post">
+      <h3>Create Post</h3>
+      <textarea id="post-content" rows="3" style="width:100%;"></textarea>
+      <button onclick="createPost()">Post</button>
+    </div>
+  </div>
+  
+  <script>
+    function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      google.script.run.withSuccessHandler(user => {
+        if(user) {
+          document.getElementById('login-section').style.display = 'none';
+          document.getElementById('classroom-section').style.display = 'block';
+          document.getElementById('user-info').innerHTML = `Welcome, ${user.Name}`;
+          loadClasses(user.UserID);
+          loadPosts();
+        } else {
+          alert('Invalid credentials');
+        }
+      }).withFailureHandler(err => {
+        alert('Error: ' + err.message);
+      }).authenticateUser(email, password);
+    }
+    
+    function loadClasses(userId) {
+      google.script.run.withSuccessHandler(classes => {
+        let html = '';
+        classes.forEach(cls => {
+          html += `<div>${cls.ClassName}</div>`;
+        });
+        document.getElementById('classes-list').innerHTML = html;
+      }).getUserClasses(userId);
+    }
+    
+    function loadPosts() {
+      google.script.run.withSuccessHandler(posts => {
+        let html = '';
+        posts.forEach(post => {
+          html += `
+            <div class="post">
+              <div><strong>${post.UserName}</strong> - ${post.Timestamp}</div>
+              <div>${post.Content}</div>
+            </div>
+          `;
+        });
+        document.getElementById('posts-container').innerHTML = html;
+      }).getAllPosts();
+    }
+    
+    function createPost() {
+      const content = document.getElementById('post-content').value;
+      google.script.run.withSuccessHandler(() => {
+        document.getElementById('post-content').value = '';
+        loadPosts();
+      }).createNewPost(content);
+    }
+  </script>
+</body>
+</html>
