@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Arial', sans-serif; }
+    #classroom-ui, #sns-ui { transition: all 0.3s; }
+    .hidden { display: none !important; }
+    .group-card { cursor: pointer; transition: transform 0.2s; }
+    .group-card:hover { transform: translateY(-3px); }
+    .chat-message { border-radius: 15px; max-width: 70%; }
+    .message-input { border-radius: 20px; }
+  </style>
+</head>
+<body>
+  <!-- Fake Goggle Classroom UI -->
+  <div id="classroom-ui">
+    <nav class="navbar navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="https://www.gstatic.com/images/branding/product/1x/classroom_2020q4_48dp.png" width="30" class="me-2">
+          Goggle Classroom
+        </a>
+        <div class="d-flex">
+          <button id="user-avatar" class="btn btn-outline-secondary rounded-circle">👤</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <h3>Your Classes</h3>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Math 101</h5>
+              <p class="card-text">Mr. Smith</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden SNS UI (Unlocked via Easter Egg) -->
+  <div id="sns-ui" class="hidden">
+    <nav class="navbar navbar-dark bg-primary">
+      <div class="container-fluid">
+        <span class="navbar-brand">🔒 Secret SNS</span>
+        <button id="close-sns" class="btn btn-light">← Back to Classroom</button>
+      </div>
+    </nav>
+
+    <div class="container-fluid mt-3">
+      <div class="row">
+        <!-- Sidebar (Groups & Friends) -->
+        <div class="col-md-3">
+          <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+              <strong>Groups</strong>
+              <button id="create-group-btn" class="btn btn-sm btn-light float-end">+ New</button>
+            </div>
+            <div class="card-body" id="groups-list">
+              <!-- Groups will load here -->
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header bg-info text-white">
+              <strong>Friends</strong>
+            </div>
+            <div class="card-body" id="friends-list">
+              <!-- Friends will load here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="col-md-9">
+          <div class="card">
+            <div class="card-header bg-secondary text-white" id="active-group-name">
+              Select a group to chat
+            </div>
+            <div class="card-body chat-window" id="chat-messages" style="height: 400px; overflow-y: scroll;">
+              <!-- Messages will appear here -->
+            </div>
+            <div class="card-footer">
+              <div class="input-group">
+                <input type="text" class="form-control message-input" id="message-input" placeholder="Type a message...">
+                <button class="btn btn-primary" id="send-message-btn">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Easter Egg Modal -->
+  <div class="modal fade" id="easter-egg-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">🔐 Enter Secret Code</h5>
+        </div>
+        <div class="modal-body">
+          <input type="password" class="form-control" id="secret-code-input" placeholder="Enter code...">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="submit-code-btn">Unlock</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Group Modal -->
+  <div class="modal fade" id="create-group-modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create New Group</h5>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control" id="new-group-name" placeholder="Group name">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirm-create-group">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Easter Egg Activation
+    let clickCount = 0;
+    document.getElementById('user-avatar').addEventListener('click', () => {
+      clickCount++;
+      if (clickCount === 2) {
+        const modal = new bootstrap.Modal(document.getElementById('easter-egg-modal'));
+        modal.show();
+        clickCount = 0;
+      }
+      setTimeout(() => { clickCount = 0; }, 1000);
+    });
+
+    // Unlock SNS with code "1357"
+    document.getElementById('submit-code-btn').addEventListener('click', () => {
+      const code = document.getElementById('secret-code-input').value;
+      if (code === "1357") {
+        document.getElementById('classroom-ui').classList.add('hidden');
+        document.getElementById('sns-ui').classList.remove('hidden');
+        bootstrap.Modal.getInstance(document.getElementById('easter-egg-modal')).hide();
+        loadGroups();
+      } else {
+        alert("Wrong code! Try again.");
+      }
+    });
+
+    // Close SNS and return to Classroom
+    document.getElementById('close-sns').addEventListener('click', () => {
+      document.getElementById('sns-ui').classList.add('hidden');
+      document.getElementById('classroom-ui').classList.remove('hidden');
+    });
+
+    // Load Groups
+    function loadGroups() {
+      google.script.run.withSuccessHandler(groups => {
+        const groupsList = document.getElementById('groups-list');
+        groupsList.innerHTML = '';
+        groups.forEach(group => {
+          const groupElement = document.createElement('div');
+          groupElement.className = 'group-card mb-2 p-2 bg-light rounded';
+          groupElement.innerHTML = `<strong>${group.name}</strong> (${group.member_count} members)`;
+          groupElement.addEventListener('click', () => openGroup(group.id, group.name));
+          groupsList.appendChild(groupElement);
+        });
+      }).getAllGroups();
+    }
+
+    // Open Group Chat
+    function openGroup(groupId, groupName) {
+      document.getElementById('active-group-name').textContent = groupName;
+      google.script.run.withSuccessHandler(messages => {
+        const chatWindow = document.getElementById('chat-messages');
+        chatWindow.innerHTML = '';
+        messages.forEach(msg => {
+          const messageElement = document.createElement('div');
+          messageElement.className = 'chat-message mb-2 p-3 bg-primary text-white';
+          messageElement.innerHTML = `<strong>User ${msg.user_id}:</strong> ${msg.text}`;
+          chatWindow.appendChild(messageElement);
+        });
+      }).getGroupMessages(groupId);
+    }
+
+    // Create New Group
+    document.getElementById('create-group-btn').addEventListener('click', () => {
+      const modal = new bootstrap.Modal(document.getElementById('create-group-modal'));
+      modal.show();
+    });
+
+    document.getElementById('confirm-create-group').addEventListener('click', () => {
+      const groupName = document.getElementById('new-group-name').value;
+      if (groupName.trim() === '') return;
+      
+      google.script.run.withSuccessHandler(() => {
+        loadGroups();
+        bootstrap.Modal.getInstance(document.getElementById('create-group-modal')).hide();
+      }).createGroup('USER_ID_HERE', groupName); // Replace with actual user ID
+    });
+
+    // Send Message
+    document.getElementById('send-message-btn').addEventListener('click', () => {
+      const message = document.getElementById('message-input').value;
+      if (message.trim() === '') return;
+      
+      // In a real app, you'd track the active group ID
+      google.script.run.withSuccessHandler(() => {
+        document.getElementById('message-input').value = '';
+        // Reload messages
+      }).sendMessage('GROUP_ID_HERE', 'USER_ID_HERE', message); // Replace with actual IDs
+    });
+  </script>
+</body>
+</html>
