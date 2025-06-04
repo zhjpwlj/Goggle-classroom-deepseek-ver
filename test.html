@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goggle Classroom</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #5f6368;
+        }
+        .logo img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #4285f4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .class-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .class-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .class-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #202124;
+        }
+        .class-teacher {
+            font-size: 14px;
+            color: #5f6368;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .modal-button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .hidden-sns {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            background-color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 2000;
+        }
+        .sns-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #e6ecf0;
+        }
+        .sns-logo {
+            color: #1da1f2;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .sns-close {
+            cursor: pointer;
+        }
+        .sns-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .sns-post {
+            border-bottom: 1px solid #e6ecf0;
+            padding: 15px 0;
+        }
+        .sns-post-user {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .sns-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-color: #1da1f2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .sns-username {
+            font-weight: bold;
+        }
+        .sns-post-content {
+            margin-bottom: 10px;
+        }
+        .sns-post-actions {
+            display: flex;
+            color: #657786;
+        }
+        .sns-action {
+            margin-right: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fake Goggle Classroom Interface -->
+    <div id="classroom-interface">
+        <div class="header">
+            <div class="logo">
+                <img src="https://www.gstatic.com/images/branding/product/1x/classroom_2020q4_48dp.png" alt="Goggle Classroom">
+                <span>Goggle Classroom</span>
+            </div>
+            <div class="user-menu">
+                <div class="user-avatar" id="version-clicker">A</div>
+            </div>
+        </div>
+
+        <div class="class-container">
+            <h2>Your Classes</h2>
+            <div class="class-grid">
+                <div class="class-card">
+                    <div class="class-title">Math 101</div>
+                    <div class="class-teacher">Mr. Smith</div>
+                </div>
+                <div class="class-card">
+                    <div class="class-title">English Literature</div>
+                    <div class="class-teacher">Ms. Johnson</div>
+                </div>
+                <div class="class-card">
+                    <div class="class-title">Computer Science</div>
+                    <div class="class-teacher">Dr. Williams</div>
+                </div>
+                <div class="class-card">
+                    <div class="class-title">History</div>
+                    <div class="class-teacher">Mrs. Brown</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version Modal (Hidden Easter Egg) -->
+    <div class="modal" id="version-modal">
+        <div class="modal-content">
+            <div class="modal-title">Version Information</div>
+            <input type="text" class="modal-input" id="version-code" placeholder="Enter code">
+            <button class="modal-button" onclick="checkVersionCode()">Submit</button>
+        </div>
+    </div>
+
+    <!-- Hidden SNS Interface -->
+    <div class="hidden-sns" id="sns-interface">
+        <div class="sns-header">
+            <div class="sns-logo">Social Network</div>
+            <div class="sns-close" onclick="hideSNS()">✕</div>
+        </div>
+        <div class="sns-content">
+            <div class="sns-post">
+                <div class="sns-post-user">
+                    <div class="sns-avatar">JD</div>
+                    <div class="sns-username">John Doe</div>
+                </div>
+                <div class="sns-post-content">
+                    Just discovered this amazing hidden feature in Goggle Classroom! #EasterEgg #SecretFeature
+                </div>
+                <div class="sns-post-actions">
+                    <div class="sns-action">❤️ 42</div>
+                    <div class="sns-action">↩️ 5</div>
+                    <div class="sns-action">🔁 12</div>
+                </div>
+            </div>
+            <div class="sns-post">
+                <div class="sns-post-user">
+                    <div class="sns-avatar">AS</div>
+                    <div class="sns-username">Alice Smith</div>
+                </div>
+                <div class="sns-post-content">
+                    The new update is incredible! So many powerful features hidden beneath the surface. 
+                    Can't wait to explore more!
+                </div>
+                <div class="sns-post-actions">
+                    <div class="sns-action">❤️ 87</div>
+                    <div class="sns-action">↩️ 9</div>
+                    <div class="sns-action">🔁 23</div>
+                </div>
+            </div>
+            <div class="sns-post">
+                <div class="sns-post-user">
+                    <div class="sns-avatar">TJ</div>
+                    <div class="sns-username">Tech Journal</div>
+                </div>
+                <div class="sns-post-content">
+                    Breaking: Goggle Classroom contains a secret social network interface accessible only through 
+                    a special code. The education platform might be testing new social features!
+                </div>
+                <div class="sns-post-actions">
+                    <div class="sns-action">❤️ 245</div>
+                    <div class="sns-action">↩️ 32</div>
+                    <div class="sns-action">🔁 56</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        let lastClickTime = 0;
+        const versionModal = document.getElementById('version-modal');
+        const versionCodeInput = document.getElementById('version-code');
+        const classroomInterface = document.getElementById('classroom-interface');
+        const snsInterface = document.getElementById('sns-interface');
+
+        document.getElementById('version-clicker').addEventListener('click', function() {
+            const currentTime = new Date().getTime();
+            
+            // Reset count if more than 1 second between clicks
+            if (currentTime - lastClickTime > 1000) {
+                clickCount = 0;
+            }
+            
+            clickCount++;
+            lastClickTime = currentTime;
+            
+            if (clickCount === 2) {
+                versionModal.style.display = 'flex';
+                clickCount = 0; // Reset for next time
+            }
+        });
+
+        function checkVersionCode() {
+            if (versionCodeInput.value === '1357') {
+                versionModal.style.display = 'none';
+                classroomInterface.style.display = 'none';
+                snsInterface.style.display = 'block';
+            } else {
+                alert('Incorrect code');
+            }
+        }
+
+        function hideSNS() {
+            snsInterface.style.display = 'none';
+            classroomInterface.style.display = 'block';
+        }
+
+        // Close modal if clicked outside
+        window.addEventListener('click', function(event) {
+            if (event.target === versionModal) {
+                versionModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
